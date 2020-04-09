@@ -1,0 +1,25 @@
+name: Build and Run Unit Tests on PR
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build and run unit tests on PR
+    steps:
+    - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # 2.0.0
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@b7821147f564527086410e8edd122d89b4b9602f # 1.4.0
+      with:
+        dotnet-version: 3.1.100
+    - name: Setup NuGet CLI
+      uses: NuGet/setup-nuget@255f46e14d51fbc603743e2aa2907954463fbeb9 # 1.0.2
+    - name: Restore with nuget
+      run: nuget restore
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+    - name: Test with dotnet
+      run: dotnet test --configuration Release --no-build --no-restore

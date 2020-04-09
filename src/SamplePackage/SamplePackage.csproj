@@ -4,4 +4,12 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Id>SamplePackage</Id>
+    <Version>1.0.0</Version>
+    <Description>Sample package demonstrating deploying via GitHub Actions.</Description>
+    <Authors>boflynn</Authors>
+    <RepositoryUrl>http://github.com/boflynn/nuget-deploy.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
 </Project>

@@ -1,0 +1,44 @@
+name: Deploy NuGet on Merge
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Deploy NuGet on merge
+    steps:
+    - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # 2.0.0
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@b7821147f564527086410e8edd122d89b4b9602f # 1.4.0
+      with:
+        dotnet-version: 3.1.100
+    - name: Setup NuGet CLI
+      uses: NuGet/setup-nuget@255f46e14d51fbc603743e2aa2907954463fbeb9 # 1.0.2
+    - name: Restore with nuget
+      run: nuget restore
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+    - name: Build NuGet package
+      run: >-
+        SHA=`git rev-parse HEAD`
+        BRANCH=`git rev-parse --abbrev-ref HEAD`
+
+        dotnet pack
+        --no-build
+        --no-restore
+        --configuration Release
+        -p:RepositoryBranch=$BRANCH
+        -p:RepositoryCommit=$SHA
+    - name: Push NuGet package
+      env:
+        NUGET_USERNAME: ${{ secrets.NUGET_USERNAME }}
+        NUGET_APIKEY: ${{ secrets.NUGET_APIKEY }}
+        NUGET_URL: ${{ secrets.NUGET_URL }}
+      run: >-
+        dotnet nuget push
+        src/SamplePackage/bin/Release/*.nupkg
+        --api-key $NUGET_USERNAME:$NUGET_APIKEY
+        --source $NUGET_URL
